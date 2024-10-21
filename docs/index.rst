@@ -2,9 +2,9 @@
 EnginIITe documentation
 =======================
 
-Add your content using ``reStructuredText`` syntax. See the
-`reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
-documentation for details.
+ENGINITE Platform Comillas.
+
+Analysis of the use of flexibility by Distribution System Operators (DSO) and their interaction with the new flexibility markets.
 
 
 .. toctree::
