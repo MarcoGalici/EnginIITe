@@ -120,13 +120,15 @@ Dictionary of Booleans
 
 **Example**::
 
-    norm_profile:
-        load_prof_p: True
-        load_prof_q: True
-        sgen_prof_p: False
-        sgen_prof_q: False
-        storage_prof_p: False
-        storage_prof_q: False
+    network:
+        profile:
+            norm_profile:
+                load_prof_p: True
+                load_prof_q: True
+                sgen_prof_p: False
+                sgen_prof_q: False
+                storage_prof_p: False
+                storage_prof_q: False
 
 
 Timeseries Output File Type
