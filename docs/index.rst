@@ -10,5 +10,5 @@ Analysis of the use of flexibility by Distribution System Operators (DSO) and th
 .. toctree::
    :maxdepth: 2
 
-   inputs
+   input
 
