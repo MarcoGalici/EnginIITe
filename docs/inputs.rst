@@ -13,8 +13,7 @@ Overview of Inputs
 
 To configure the platform, the following input files (or parameters) are required:
 
-- **Configuration File**: This file, in the format of `.yaml` defines the general simulation parameters and configuration
-details.
+- **Configuration File**: This file, in the format of `.yaml` defines the general simulation parameters and configuration details.
 - **Network File**: An Excel file containing distribution network details, including node and connection data.
 - **FSP File**: An Excel file containing information on flexibility service providers, such as IDs, capacities, and prices.
 - **Profile File**: An Excel file that define load, generation and storage profiles for various network resources.
