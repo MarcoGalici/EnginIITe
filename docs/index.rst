@@ -4,11 +4,12 @@ EnginIITe documentation
 
 ENGINITE Platform Comillas.
 
-Analysis of the use of flexibility by Distribution System Operators (DSO) and their interaction with the new flexibility markets.
+Analysis of the use of flexibility by Distribution System Operators (DSO) and their interaction with the new flexibility
+markets.
 
 
 .. toctree::
-   :maxdepth: 2
+    :maxdepth: 2
 
-   input
-
+    about
+    input
