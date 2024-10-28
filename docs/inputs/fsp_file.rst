@@ -35,8 +35,8 @@ For the fsp files folder the correct folder is in the following path:
 
 For the sake of clarity, the following root tree represents the initial root tree of the platform.
 
-::
 
+..
     EnginIITe
     ├── config
     └── data_in
