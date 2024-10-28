@@ -24,9 +24,9 @@ To learn more about each input file and see configuration examples, refer to the
    :maxdepth: 1
 
    inputs/config_file
-   inputs/profiles_file
    inputs/network_file
-
+   inputs/fsp_file
+   inputs/profiles_file
 
 .. note::
 
