@@ -151,27 +151,6 @@ Dictionary
                     external: 'storage_initprof_param.xlsx'
 
 
-Normalize Profile
--------------------
-The normalize profile parameter specifies whether the corresponding profiles,
-defined in the `profile_filename` parameter above, should be normalized.
-
-**Type**:  
-Dictionary of Booleans
-
-**Example**::
-
-    network:
-        profile:
-            norm_profile:
-                load_prof_p: True
-                load_prof_q: True
-                sgen_prof_p: False
-                sgen_prof_q: False
-                storage_prof_p: False
-                storage_prof_q: False
-
-
 Timeseries Output File Type
 -----------------------------
 The timeseries output file type defines the file format for storing time-series simulation output.
