@@ -8,7 +8,7 @@ The Flexibility Service Provider (FSP) files are essential for configuring flexi
 These files contain data about each provider's capabilities, locations, and costs associated with various flexibility services.
 
 File Format and Requirements
-----------------------------
+------------------------------
 
 FSP files **must be saved in Excel format** (`.xlsx`).
 The platform is designed to read and interpret data only from Excel files, so using a different format will cause errors
