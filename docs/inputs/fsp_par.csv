@@ -1,0 +1,16 @@
+**Parameter**;**Datatype**;**Value Range**;**Explanation**
+id;String;;Name of the FSP
+bus;integer;;Index of connected bus
+name;String;:math:`\geq 0`;Name of the resource in the network file
+type;String;;Name of the resource element that is associated to the model in the platform
+mva;float;:math:`\geq 0`;Rated power of the load [kVA] 
+mw;float;;Active power of the load [MW]
+mvar;float;;Reactive power of the load [MVar]
+Pup;float;;Percentage of mw that the FSP is available to increase with respect to the initial profile [%]
+Pdown;float;;Percentage of mw that the FSP is available to decrease with respect to the initial profile [%]
+Pup_cost;float;;Cost of the energy that the FSP increased with respect to the initial profile [€/MWh]
+Pdown_cost;float;;Cost of the energy that the FSP decreased with respect to the initial profile [€/MWh]
+Qup;float;;Percentage of mvar that the FSP is available to increase with respect to the initial profile [%]
+Qdown;float;;Percentage of mvar that the FSP is available to decrease with respect to the initial profile [%]
+Qup_cost;float;;Cost of the energy that the FSP increased with respect to the initial profile [€/MVArh]
+Qdown_cost;float;;Cost of the energy that the FSP decreased with respect to the initial profile [€/MVArh]
