@@ -9,7 +9,7 @@ market model settings, and simulation parameters.
 
 
 Simulation Tag
---------------
+----------------
 The simulation tag is a tag added at the end of the result outputs to identify the simulation.
 This helps differentiate between various simulations when running sensitivity analyses.
 
@@ -23,7 +23,7 @@ String
 
 
 Simulation Window
------------------
+-------------------
 The simulation window defines the start and end time intervals to be analyzed during the simulation.
 It requires two parameters; the initial interval and the last (plus one) interval.
 The simulation window is agnostic of the granularity of the simulation, but it depends on the specific intervals.
@@ -37,13 +37,13 @@ List of two integers
 
 
 Network Parameters
-------------------
+--------------------
 
 Inside the parameter `network` have been defined several sub-parameters.
 In the following each sub-parameter is described.
 
 Net Folder
-----------
+------------
 The net folder parameter defines the name of the folder where the network data are stored.
 
 **Type**:  
@@ -70,7 +70,9 @@ String
 
 
 Profiles
---------
+----------
+.. _profiles:
+
 The Enginite platform defines 4 categories of resources in the electrical network:
 
 * Load
@@ -82,15 +84,25 @@ Each category may be composed of different resources. For instance, the Load cat
 flexible load, heatpump etc.
 
 In the configuration file, nested in the `network` parameter is defined the `profile` parameter. In addition, nested in
-the `profile` parameter have been defined two additional parameters:
+the `profile` parameter have been defined the resource category parameters:
 
-* `profile_filename`
-* `norm_profile`
+* `load` - Load
+* `sgen` - Static Generator
+* `gen` - Generator
+* `storage` - Storage
 
-Profile Filename
-----------------
-The parameter profile filename contains the names of files per product (Active Power and Reactive Power)
-that define the resource profiles (e.g., load, storage, and generation).
+Nested in the resource category parameters are nested the product of the market:
+
+* `p` - Active Power
+* `q` - Reactive Power
+
+Finally, nested on the market's products are defined the profile type:
+
+* `denorm` - Denormalized Profile
+* `norm` - Normalized Profile
+* `external` - External Profile
+
+
 The platform will load these profiles to set up the simulation.
 The extension of the file can be '.csv' or '.xlsx'.
 
@@ -101,17 +113,46 @@ Dictionary
 
     network:
         profile:
-            profile_filename:
-                load_prof_p: 'profile_df_load_p.cvs'
-                load_prof_q: 'profile_df_load_q.csv'
-                sgen_prof_p: 'profile_df_sgen_p_maxgen.csv'
-                sgen_prof_q: 'profile_df_sgen_q_maxgen.csv'
-                storage_prof_p: 'profile_df_storage_p.csv'
-                storage_prof_q: 'profile_df_storage_q.csv'
+            load:
+                p:
+                    denorm: 'denorm_profile_load_p.xlsx'
+                    norm: 'norm_profile_load_p.xlsx'
+                    external: ''
+                q:
+                    denorm: 'denorm_profile_load_q.xlsx'
+                    norm: 'norm_profile_load_q.xlsx'
+                    external: ''
+            sgen:
+                p:
+                    denorm: 'denorm_profile_sgen_p_maxgen.xlsx'
+                    norm: ''
+                    external: ''
+                q:
+                    denorm: 'denorm_profile_sgen_p_maxgen.xlsx'
+                    norm: ''
+                    external: ''
+            gen:
+                p:
+                    denorm: ''
+                    norm: ''
+                    external: ''
+                q:
+                    denorm: ''
+                    norm: ''
+                    external: ''
+            storage:
+                p:
+                    denorm: ''
+                    norm: ''
+                    external: 'storage_initprof_param.xlsx'
+                q:
+                    denorm: ''
+                    norm: ''
+                    external: 'storage_initprof_param.xlsx'
 
 
 Normalize Profile
------------------
+-------------------
 The normalize profile parameter specifies whether the corresponding profiles,
 defined in the `profile_filename` parameter above, should be normalized.
 
@@ -132,7 +173,7 @@ Dictionary of Booleans
 
 
 Timeseries Output File Type
----------------------------
+-----------------------------
 The timeseries output file type defines the file format for storing time-series simulation output.
 
 **Type**:  
@@ -145,7 +186,7 @@ String
 
 
 Flexibility Service Providers
------------------------------
+-------------------------------
 The Enginite platform allows the user to simulate different flexibility markets per market model, market product,
 market voltage limitation, market storage capacity and finally per flexibility service provider (aka fsp) category.
 In the configuration file, nested in the `network` parameter is defined the `fsp` parameter.
@@ -168,7 +209,7 @@ bidding strategy, and input file.
 
 
 Model Tag
----------
+-----------
 The model tag parameter defines the market model used in the simulation.
 Available options:
 
@@ -185,7 +226,7 @@ String
 
 
 Product Tag
------------
+-------------
 The product tag parameter specifies the type of market products considered in the simulation.
 It can be for Active Power (P), Reactive Power (Q), or both.
 
@@ -198,7 +239,7 @@ List of Strings
 
 
 Voltage Limitation Tag
-----------------------
+------------------------
 The voltage limitation parameter defines the voltage limitations for the simulation.
 Each tag represents a different voltage range.
 
@@ -217,7 +258,7 @@ List of Strings
 
 
 Flexibility Service Provider Tag
---------------------------------
+----------------------------------
 The flexibility service provider tag parameter defines the percentage increments for FSP capacity activation.
 
 **Type**:  
@@ -237,7 +278,7 @@ List of Strings
 
 
 Storage Tag
------------
+-------------
 The storage tag parameter defines a multiplier for storage capacity activation.
 If requires a string (i.e., 'SK01') where the number at the end defines the multiplier. For instance 'SK02' define a
 storage capacity two times the initial value of the storage present in the network file.
@@ -251,7 +292,7 @@ String
 
 
 Scenario and Cost Parameters
-----------------------------
+------------------------------
 For each resource category in the electrical network, the Enginite platform allows the user to define a multipliers
 that is applied to the load, static generation, generator and storage profiles for a given scenario.
 In case one category is not included in the network, the user can avoid define the parameter for that specific resource.
@@ -268,7 +309,7 @@ Integer
 
 
 BetaCost
---------
+----------
 The beta cost parameter represents the Value of Lost Load (VOLL), measured in EUR/MWh, based on the country in question.
 
 * For Spain: 5890 [EUR/MWh]
@@ -290,7 +331,7 @@ Integer
 
 
 Frequency
----------
+-----------
 Frequency setting for the power flow algorithm.
 
 **Type**:  
@@ -302,7 +343,7 @@ Integer
 
 
 Power Flow Algorithm
---------------------
+----------------------
 The power flow algorithm parameter specifies the power flow algorithm to be used.
 Available options include:
 
@@ -318,7 +359,7 @@ String
 
 
 Sensitivity Factors Mode
-------------------------
+--------------------------
 Defines the mode for sensitivity factor calculation.
 
 **Type**:  
@@ -330,7 +371,7 @@ String
 
 
 Sensitivity Factors Threshold
------------------------------
+-------------------------------
 If the number of hours multiplied by the number of pilot bus exceeds this threshold,
 the matrix of the worst hour will be used.
 
@@ -343,7 +384,7 @@ Integer
 
 
 Debug Power Flow Results to Excel
----------------------------------
+-----------------------------------
 When set to `True`, power flow results are saved to Excel for debugging.
 
 **Type**:  
@@ -355,7 +396,7 @@ Boolean
 
 
 Debug Pilot Bus
----------------
+-----------------
 When set to `True`, the file `VPilotBus_FULLH_FULLBUS.csv` is saved in the Market_input folder.
 
 **Type**:  
@@ -367,7 +408,7 @@ Boolean
 
 
 KPI Parameters
-------------
+----------------
 Tolerances for voltage and current simulations. These parameters impact both the market and KPI evaluation.
 
 **Type**:  

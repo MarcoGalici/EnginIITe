@@ -81,9 +81,18 @@ generally to all resources sharing that profile.
      - 0.29319
      - 1.932226
 
-For profiles defined via an external module, there is no need for a profile file.
-However, a module must be defined within the platform that provides the profile data directly to the system.
+For profiles defined via an external module, there is no need for a profile file unless required by the user.
 This option is used when profiles require more complex calculations or are generated according to the user preferences.
+In case the user need to pass input parameters to the external module that defines the profiles,
+as presented as example of profiles definition in the :ref:`Config File Documentation <_profiles>`,
+the user can add the name of the input parameters file for the external module. This file must be saved in the following
+folder:
+
+::
+
+    C:\Users\...\EnginIITe\data_in\my_network_name\fsp_files
+
+In addition, the external module must be defined within the resource module.
 
 
 Saving Folder
