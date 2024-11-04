@@ -1,13 +1,3 @@
-import os
-import yaml
-import importlib
-import copy as cp
-import pandas as pd
-import pandapower as pp
-from pathlib import Path
-from functions import auxiliary as aux
-
-
 def import_yaml(_yaml_filename, _folder, **kwargs):
     """
     This function imports the yaml configuration file.
@@ -18,222 +8,263 @@ def import_yaml(_yaml_filename, _folder, **kwargs):
         **_folder** (string) - Folder in which the yaml config files are saved.
 
     Output:
-        **_config_file** () - config network file data.
+        **_config_file** (dict) - config network file data.
 
     Example:
-        import_yaml('my_yaml_file.yaml', 'my_folder')
+
+    >>> my_config_yaml_file = import_yaml('my_yaml_file.yaml', 'my_folder')
+
     """
-
-    additional_kwargs = {key: val for key, val in kwargs.items()}
-
-    with open(os.path.join(os.getcwd(), _folder, _yaml_filename), 'r') as _filename:
-        _config_file = yaml.safe_load(_filename)
-    return _config_file
+    return True
 
 
 def import_network(_net_data, _in_root='data_in', _folder='network', **kwargs):
     """
-    Import network file according to pandapower format.
+    This function imports the electrical network from Excel file according to pandapower format.
 
-    :param _net_data: Dictionary with the network input (Network Folder, Network filename, and Network Profiles)
-    :param _in_root: Root in which the input files are saved
-    :param _folder: Folder in which the xlsx network files are saved
-    :return: network data according to pandapower
+    Input:
+        **_net_data** (dict) - Dictionary with the network input from Yaml file.
+
+        **_in_root** (string, 'data_in') - Root in which the network file is saved.
+
+        **_folder** (string, 'network') - Folder in which the .xlsx network file is saved.
+
+    Output:
+        **net** (attrdict) - Pandapower network.
+
+    Example:
+
+    >>> cfg_file = import_yaml('my_yaml_file.yaml', 'my_folder')
+    >>> my_pandapower_network = import_network(cfg_file['network'])
+
     """
-    additional_kwargs = {key: val for key, val in kwargs.items()}
-    file_extension = _net_data['net_filename'].split('.')[-1]
-    _net_name = _net_data['net_folder']
-    _net_filename = _net_data['net_filename']
-    _root2network = os.path.join(os.getcwd(), _in_root, _net_name, _folder, _net_filename)
-    if file_extension == 'xlsx':
-        net = pp.from_excel(_root2network)
-    else:
-        raise ValueError('The format {0} is not supported.'.format(file_extension))
-    return cp.deepcopy(net)
+    return True
 
 
-def import_denorm_profiles(_filename, _timestep, **kwargs):
+def read_file_profiles(_root2file, _timestep, **kwargs):
     """
-    Import denormalized network profiles
-    :param _filename: Filename to be read
-    :param _timestep: Time intervals to be analysed
-    :return: dictionary with the profile values
+    This function reads the file of profiles for specific time intervals.
+    This function allows two file extensions: i) .csv and ii) .xlsx.
+    In case of .xlsx, this function requires that the name of the file and the name of the sheet
+    that contains the profiles are the same.
+
+    Input:
+        **_filename** (string) - Filename to be read.
+
+        **_timestep** (list of integers) - Time intervals to be analysed.
+
+    Output:
+        **df_prof** (dict) - Dictionary with the profile values.
+
+    Example:
+
+    >>> import os
+    >>> file2read = os.path.join(os.getcwd(), 'my_folder', 'my_profile_file.xlsx')
+    >>> my_dictionary_profiles_from_file = read_file_profiles(file2read, [0, 24])
+
     """
-    additional_kwargs = {key: val for key, val in kwargs.items()}
-    _file_ext = _filename.split('.')[1]
-    if _file_ext == 'xlsx':
-        try:
-            _sheet = os.path.split(_filename)[1].split('.')[0]
-        except ValueError:
-            _sheet = os.path.split(_filename)[1].split('.')[0]
-            _mess = 'The sheet of the file Excel must be equal to the name of the file. Correct the name "{_sheet}".'.format(_sheet=_sheet)
-            raise ValueError(_mess)
-        df_prof = pd.read_excel(_filename, sheet_name=_sheet, index_col=0).iloc[range(_timestep[0], _timestep[1])]
-    elif _file_ext == 'csv':
-        df_prof = pd.read_csv(_filename, index_col=0).iloc[range(_timestep[0], _timestep[1])]
-    else:
-        raise ValueError('The extension "{_ext}" is not supported.'.format(_ext=_file_ext))
-    return df_prof
+    return True
 
 
-def import_norm_profiles(_pp_net, _filename, _timestep, _res, _product, _list_res, **kwargs):
+def import_norm_profiles(_root2file, _timestep, _res_pp, _product, **kwargs):
     """
-    Import network normalize profiles of specific resource.
-    :param _pp_net: Pandapower network
-    :param _filename: Filename to be read
-    :param _timestep: Time intervals to be analysed
-    :param _res: Type of resource from which the profile are uploaded
-    :param _product: Type of product from which the profile are uploaded
-    :param _list_res: List of resource available
-    :return: dictionary with the profile values
+    This function imports the normalized profiles of specific resources.
+
+    Input:
+        **_root2file** (string) - Path to the file to be read.
+
+        **_timestep** (list of integers) - Time intervals to be analysed.
+
+        **_res_pp** (Dataframe) - Dataframe of the resources to which the normalized profiles are applied.
+        The Dataframe must be configured like the resource Dataframe of pandapower network.
+
+        **_product** (string) - Type of market product. It can be 'p' or 'q'.
+
+    Output:
+        **df_product** (Dataframe) - Dataframe of the profiles.
+
+    Example:
+
+    >>> import os
+    >>> import pandapower.networks
+    >>> file2read = os.path.join(os.getcwd(), 'my_folder', 'my_profile_file.xlsx')
+    >>> net = pandapower.networks.example_multivoltage()
+    >>> my_normalized_dataframe_profile = import_norm_profiles(file2read, [0, 24], net.load, 'p')
+
     """
-    additional_kwargs = {key: val for key, val in kwargs.items()}
-    norm_df_prof = import_denorm_profiles(_filename=_filename, _timestep=_timestep, _add_args=additional_kwargs)
-
-    dict_product = dict()
-    _res_pp = None
-    if _res == _list_res[0]:
-        _res_pp = cp.deepcopy(_pp_net.load)
-    elif _res == _list_res[1]:
-        _res_pp = cp.deepcopy(_pp_net.sgen)
-    elif _res == _list_res[2]:
-        _res_pp = cp.deepcopy(_pp_net.gen)
-    elif _res == _list_res[3]:
-        _res_pp = cp.deepcopy(_pp_net.storage)
-
-    for _i, _device in _res_pp.iterrows():
-        _prof_cat = _device['prof_name']
-        if _product == 'p':
-            dict_product[_i] = norm_df_prof[_prof_cat] * _device.p_mw
-        if _product == 'q':
-            dict_product[_i] = norm_df_prof[_prof_cat] * _device.q_mvar
-
-        # if isinstance(_prof_cat, str):
-        #     if _product == 'p':
-        #         dict_product[_i] = norm_df_prof[_prof_cat] * _device.p_mw
-        #     if _product == 'q':
-        #         dict_product[_i] = norm_df_prof[_prof_cat] * _device.q_mvar
-        # else:
-        #     # Here we call the Profile definition for the resource
-        #     # I dati necessari ad eseguire la valutazione dei profili di input li leggiamo qui.
-        #     dict_res_profiles = aux.set_resource_profiles()
-        #     for _element in dict_res_profiles.keys():
-        #         list_res = dict_res_profiles.get(_element, None)
-        #         if list_res is None:
-        #             raise IOError('Resource of type {_class} is unknown.'.format(_class=_i))
-        #
-        #         res_lib = importlib.import_module(f'functions.market.models.{list_res}')
-
-    df_product = pd.DataFrame().from_dict(dict_product)
-    return df_product
+    return True
 
 
-def import_profiles(_pp_net, _net_data, _timestep, _in_root='data_in', _folder='profile', **kwargs):
+def import_ext_profiles(_root2inputs, _timestep, _res_pp, **kwargs):
     """
-    Import network profiles of specific resource.
-    :param _pp_net: Pandapower network
-    :param _net_data: Dictionary with the network input (Network Folder, Network filename, and Network Profiles)
-    :param _timestep: Time intervals to be analysed
-    :param _in_root: Root in which the input files are saved
-    :param _folder: Folder in which the xlsx network files are saved
-    :return: dictionary with the profile values
+    This function imports the profiles from an external module that evaluates the profile according to the user
+    preferencies.
+
+    Input:
+        **_root2inputs** (string) - Path to the input parameters file to be read.
+
+        **_timestep** (list of integers) - Time intervals to be analysed.
+
+        **_res_pp** (Dataframe) - Dataframe of the resources to which the external module evaluation are applied.
+        The Dataframe must be configured like the resource Dataframe of pandapower network.
+
+    Output:
+        **res_category_prof_p** (Dataframe) - Dataframe of the Active Power profiles.
+
+        **res_category_prof_q** (Dataframe) - Dataframe of the Reactive Power profiles.
+
+    Example:
+
+    >>> import os
+    >>> import pandapower.networks
+    >>> file2read = os.path.join(os.getcwd(), 'my_folder', 'my_profile_file.xlsx')
+    >>> net = pandapower.networks.example_multivoltage()
+    >>> P_dataframe_profile, Q_dataframe_profile = import_ext_profiles(file2read, [0, 24], net.load)
+
     """
-    _list_res = ['load', 'sgen', 'gen', 'storage']
-    additional_kwargs = {key: val for key, val in kwargs.items()}
-    _net_name = _net_data['net_folder']
-    _profile_data = _net_data['profile']
-    _filenames = _profile_data['profile_filename']
-    _norms = _profile_data['norm_profile']
-    dict_profiles = dict()
-    for _k, _v in _norms.items():
-        _root2file = os.path.join(os.getcwd(), _in_root, _net_name, _folder, _filenames[_k])
-        if _v:
-            _res = _k.split('_')[0]
-            _product = _k.split('_')[-1]
-            dict_profiles[_k] = import_norm_profiles(_pp_net=_pp_net, _filename=_root2file, _timestep=_timestep,
-                                                     _res=_res, _product=_product, _list_res=_list_res,
-                                                     _add_args=additional_kwargs)
-        else:
-            dict_profiles[_k] = import_denorm_profiles(_filename=_root2file, _timestep=_timestep,
-                                                       _add_args=additional_kwargs)
-        # Transform column into integer
-        dict_profiles[_k].columns = dict_profiles[_k].columns.astype(int)
-    return dict_profiles
+    return True
 
 
-def import_profiles_s01(_cfg_file, _pp_net, _timestep, _in_root='data_in', _folder='profile',
-                        _net_page='net_folder', _net_prof_page='profile', _prof_files_page='profile_filename',
-                        _prof_norm_page='norm_profile', **kwargs):
+def import_profiles(_pp_net, _net_data, _timestep, _in_root='data_in', _folder_prof='profile', _folder_ext='fsp_files', **kwargs):
     """
-    Import network profiles of specific resource.
-    :param _cfg_file: Configuration network file
-    :param _pp_net: Pandapower network
-    :param _timestep: Time intervals to be analysed
-    :param _in_root: Root in which the input files are saved
-    :param _folder: Folder in which the xlsx network files are saved
-    :param _net_page: Dictionary page in which the network name is saved
-    :param _net_prof_page: Dictionary page in which the network profile information are saved
-    :param _prof_files_page: Dictionary page in which the network profile file names are saved
-    :param _prof_norm_page: Dictionary page in which the info about the normalize data or not are saved
-    :return: dictionary with the profile values
-    """
-    additional_kwargs = {key: val for key, val in kwargs.items()}
-    dict_profiles = import_profiles(_pp_net=_pp_net, _net_data=_cfg_file['network'], _timestep=_timestep,
-                                    _in_root=_in_root, _folder=_folder, _add_args=additional_kwargs)
+    This function imports the network profiles for all the resources included in the network.
+    In case a resource category is not present in the network file, this resource category will be skipped.
 
-    dict_profiles_s01 = cp.deepcopy(dict_profiles)
-    for _key, _value in dict_profiles_s01.items():
-        try:
-            if 'load' in _key:
-                dict_profiles_s01[_key] = _value * _cfg_file['scen_factor_load']
-            elif 'sgen' in _key:
-                dict_profiles_s01[_key] = _value * _cfg_file['scen_factor_sgen']
-            elif 'gen' in _key:
-                dict_profiles_s01[_key] = _value * _cfg_file['scen_factor_gen']
-            elif 'storage' in _key:
-                dict_profiles_s01[_key] = _value * _cfg_file['scen_factor_storage']
-        except Exception as _:
-            raise UserWarning('{_res} profiles or scenario factor not found.'.format(_res=_key))
-    return dict_profiles_s01
+    Input:
+        **_pp_net** (dict) - The pandapower format network.
+
+        **_net_data** (dict) - Dictionary with the network input from Yaml file.
+
+        **_timestep** (list of integers) - Time intervals to be analysed.
+
+        **_in_root** (string, data_in) - Root in which the input files are saved.
+
+        **_folder_prof** (string, profile) - Root in which the input profile files are saved.
+
+        **_folder_ext** (string, fsp_files) - Root in which the input parameters of fsp, and the input parameters for
+        the evaluation of the profiles from an external module are saved.
+
+    Output:
+        **dict_profiles** (dict) - Dictionary with the profiles.
+
+    Example:
+
+    >>> import pandapower.networks
+    >>> net = pandapower.networks.example_multivoltage()
+    >>> cfg_file = import_yaml('my_yaml_file.yaml', 'my_folder')
+    >>> dictionary_profiles = import_profiles(net, cfg_file['network'], [0, 24], 'data_in', 'profile', 'fsp_files')
+
+    """
+    return True
+
+
+def import_profiles_s01(_cfg_file, _pp_net, _timestep, _in_root='data_in', _folder='profile', **kwargs):
+    """
+    This function imports the network profiles for the initial scenario for all the resources categories included
+    in the network. The resource categories are: 1) load, 2) gen, 3) sgen and 4) storage. It is important to point out
+    that in the config file, the scenario factors for each category included in the network must be defined.
+    The scenario factors are: 1) scen_factor_load, 2) scen_factor_gen, 3) scen_factor_sgen and 4) scen_factor_storage.
+
+    Input:
+        **_cfg_file** (dict) - Dictionary with the network input from Yaml file.
+
+        **_pp_net** (dict) - The pandapower format network.
+
+        **_timestep** (list of integers) - Time intervals to be analysed.
+
+        **_in_root** (string, data_in) - Root in which the input files are saved.
+
+        **_folder** (string, profile) - Folder in which the xlsx network files are saved.
+
+    Output:
+        **dict_profiles_s01** (dict) - Dictionary with the profile values.
+
+    Example:
+
+    >>> import pandapower.networks
+    >>> net = pandapower.networks.example_multivoltage()
+    >>> cfg_file = import_yaml('my_yaml_file.yaml', 'my_folder')
+    >>> dictionary_profiles_scenario01 = import_profiles_s01(cfg_file['network'], net, [0, 24], 'data_in', 'profile')
+
+    """
+    return True
 
 
 def import_data(_filename, _root, _sheetname=None, _index_col=None, _header=0):
-    """Check the filename in the input root and import the file.
-    :param _filename: Name of the file to import (format csv or xlsx)
-    :param _root: Full directory in which the file is saved
-    :param _sheetname: Name of the sheet in which the information are saved (only xlsx file)
-    :param _index_col: Column(s) to use as row label(s), denoted either by column labels or column indices
-    :param _header: Row number(s) containing column labels and marking the start of the data
-    :return: Dataframe with the information contained in the file passed.
     """
-    if _filename is None:
-        raise ValueError('No filename have been passed.')
-    if _root is None:
-        raise ValueError('No root to filename have been passed.')
+    This function imports the data from file passed as input.
+    Two extension of files are available: i) .csv and ii) .xlsx.
 
-    _tmp_data = None
-    _ext = Path(_filename).suffix
-    if _ext == '.csv':
-        _tmp_data = pd.read_csv(os.path.join(_root, _filename), index_col=_index_col, header=_header)
-    elif _ext == '.xlsx':
-        _tmp_data = pd.read_excel(os.path.join(_root, _filename), index_col=_index_col, header=_header, sheet_name=_sheetname)
-    return _tmp_data
+    Input:
+        **_filename** (string) - Name of the file to import (format .csv or .xlsx).
+
+        **_root** (string) - Full directory in which the file is saved.
+
+        **_sheetname** (string, None) - If .xlsx extension is selected, it represents the name of the sheet in which
+         the information are saved (only xlsx file).
+
+        **_index_col** (int, None) - Column(s) to use as row label(s), denoted either by column labels or column indices.
+
+        **_header** (int, 0) - Row number(s) containing column labels and marking the start of the data.
+
+    Output:
+        **_tmp_data** (Dataframe) - Dataframe with the information contained in the file passed.
+
+    Example:
+
+    >>> import os
+    >>> my_root = os.path.join(os.getcwd(), 'my_folder')
+    >>> my_dataframe_data = import_data('my_file.xlsx', my_root, 'my_sheet', 0, 0)
+
+    """
+    return True
 
 
 def save_excel(_data, _outroot, _filename, _sheetname, _mode='w', _extension='.xlsx'):
-    """Save results into Excel files"""
-    if not isinstance(_data, pd.DataFrame):
-        raise ValueError('Format type {0} not supported.'.format(str(type(_data))))
-    root2file = os.path.join(_outroot, _filename + _extension)
-    with pd.ExcelWriter(root2file, engine='openpyxl', mode=_mode) as writer:
-        _data.to_excel(writer, sheet_name=_sheetname)
+    """
+    This function saves results into Excel files.
+
+    Input:
+        **_data** (Dataframe) - Dataframe to be saved.
+
+        **_outroot** (string) - Output path to folder where to save input dataframe.
+
+        **_filename** (string) - Name of the Excel file to be saved.
+
+        **_sheetname** (string) - Name od the sheet of the Excel file to be saved.
+
+        **_mode** (string, w) - File mode to use (write: 'w' or append: 'a').
+
+        **_extension** (string, .xlsx) - Extension of the Excel file.
+
+    Example:
+
+    >>> import pandas as pd
+    >>> my_empty_dataframe = pd.DataFrame()
+    >>> save_excel(my_empty_dataframe, 'my_path_to_folder', 'my_filename', 'my_sheetname', 'w', '.xlsx')
+
+    """
     return True
 
 
 def save_cvs(_data, _outroot, _filename, _extension='.csv'):
-    """Save results into Comma Separated Value files"""
-    if not isinstance(_data, pd.DataFrame):
-        raise ValueError('Format type {0} not supported.'.format(str(type(_data))))
-    root2file = os.path.join(_outroot, _filename + _extension)
-    _data.to_csv(root2file, encoding='utf-8')
+    """
+    This function saves results into Comma Separated Values files.
+
+    Input:
+        **_data** (Dataframe) - Dataframe to be saved.
+
+        **_outroot** (string) - Output path to folder where to save input dataframe.
+
+        **_filename** (string) - Name of the Excel file to be saved.
+
+        **_extension** (string, .csv) - Extension of the CSV file.
+
+    Example:
+
+    >>> import pandas as pd
+    >>> my_empty_dataframe = pd.DataFrame()
+    >>> save_cvs(my_empty_dataframe, 'my_path_to_folder', 'my_filename', '.csv')
+
+    """
     return True
