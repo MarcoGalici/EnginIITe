@@ -167,15 +167,14 @@ String
 Flexibility Service Providers
 -------------------------------
 The Enginite platform allows the user to simulate different flexibility markets per market model, market product,
-market voltage limitation, market storage capacity and finally per flexibility service provider (aka fsp) category.
+market voltage limitation, market storage capacity and finally per flexibility service provider (a.k.a. fsp) category.
 In the configuration file, nested in the `network` parameter is defined the `fsp` parameter.
-This parameter allows to configure parameter related to the flexibility service providers, including their data source,
-bidding strategy, and input file.
+This parameter allows to configure parameter related to the flexibility service providers, including their data source
+and input file.
 
 **Sub-Parameters**:
 
 - ``fsp_sheetname`` - (*string*): Name of the sheet where FSP data is saved.
-- ``fsp_bidding_strategy`` - (*string*): Strategy used by FSPs to submit bids in the market. Options are 'initial_value' or 'mva_value'.
 - ``fsp_input_filename`` - (*string*): File containing the FSP data. The extension of the file can only be '.xlsx'.
 
 **Example**::
@@ -183,7 +182,6 @@ bidding strategy, and input file.
     network:
         fsp:
             fsp_sheetname: 'fsp_data'
-            fsp_bidding_strategy: 'initial_value'
             fsp_input_filename: 'FSP_data_PL.xlsx'
 
 
@@ -268,6 +266,57 @@ String
 **Example**::
 
     StorageTag: 'SK01'
+
+
+Intertemporal Constraints
+------------------------------
+The EnginIITe platform allows the user to simulate resources that require intertemporal relationship between the
+equations. An example could be the storage. To activate such intertemporal correlations in the equation, the user can
+set as true the parameter `intertemp_cons`.
+
+**Type**:
+Boolean
+
+**Example**::
+
+    intertemp_cons: True
+
+
+Consecutive Hours Parameter
+------------------------------
+This parameter is active only when the `intertemp_cons` parameter is active as well. This parameter set the number of
+consecutive hours that will be linked for creating the simulation hours. This means that if the hours with thermal or
+over/under voltage issues are not consecutive, and the `intertemp_cons` parameter is active, the platform will create a
+simulation window in which the hours with thermal or over/under voltage issues are connected in a window of at least
+`consecutive_hours` values. In case the hours with thermal or over/under voltage issues cannot be connected in a window
+of at least `consecutive_hours` values, the platform will put the hours with issues at the center of a simulation
+window of `consecutive_hours` values. To clarify is provided an example in the following:
+
+- hours_with_issues: [12, 13, 14, 54, 64, 79, 122]
+
+- new_simulation_window: [0, ..., 12, 13, 14, ..., 27, 42, ..., 54, ..., 64, ..., 76, 77, 78, 79, ..., 91, 110, ..., 122, ..., 134]
+
+**Type**:
+Integer
+
+**Example**::
+
+    consecutive_hours: 24
+
+
+Worst Hour Evaluation
+-----------------------------
+To narrow down the evaluation, the EnginIITe platform allows the user to localize the simulation to the worst hours.
+This scenario foresees that the simulation is limited to the worst hout of the congestion or voltage issues.
+In case the `intertemp_cons` parameter is active, a simulation window of `consecutive_hours` will be created with
+the worst hour at the center.
+
+**Type**:
+Boolean
+
+**Example**::
+
+    only_worst_hour: True
 
 
 Scenario and Cost Parameters
