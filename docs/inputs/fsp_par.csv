@@ -3,6 +3,7 @@ id;String;;Name of the FSP
 bus;integer;;Index of connected bus
 name;String;:math:`\geq 0`;Name of the resource in the network file
 type;String;;Name of the resource element that is associated to the model in the platform
+aggregator_name;String;;Name of the Aggregator that will interact in the market on behalf of the resource
 mva;float;:math:`\geq 0`;Rated power of the load [kVA] 
 mw;float;;Active power of the load [MW]
 mvar;float;;Reactive power of the load [MVar]

@@ -151,6 +151,52 @@ Dictionary
                     external: 'storage_initprof_param.xlsx'
 
 
+Profile Modules Configuration
+------------------------------
+The `profile_modules` parameter is a dictionary used to define the resource profile modules for each resource type in
+the platform. This dictionary maps resource names to the Python files that contain the respective resource profile
+definitions. This configuration allows users to customize how different resources (such as storage and load)
+are modeled in the platform. The structure of the dictionary is as follow:
+
+- **Key (Resource Name)**: The name of the resource as set by the user.
+This name must exactly match the value in the `"element_name"` column of the resource category in the network file.
+
+- **Value (Model File)**: The name of the Python file where the model for the respective resource is implemented.
+The filename should be provided without the `.py` extension.
+
+To clarify, ensure that each **resource name** used as a key in the dictionary matches the `"element_name"` column in
+the network's file as in the figure.
+
+.. image:: /pics/profile_modules.jpg
+    :width: 400 px
+    :align: center
+
+
+Additionally, the **Python file** should contain the logic and definitions for each specific resource's profile model.
+Do not include the `.py` extension when specifying the Python file name. It is suggested that only the required modules
+for the resources included in the network, are defined in the dictionary.
+
+**Type**:
+Dictionary
+
+**Example**::
+
+    profile_modules:
+        storage: 'storage_model'
+        load: 'load_model'
+
+
+In this example:
+
+- *storage*: Uses the `storage_model.py` file to define the profile model for storage resources.
+
+- *load*: Uses the `load_model.py` file to define the profile model for load resources.
+
+All the Python files must be saved in the following path::
+
+    C:\Users\...\EnginIITe\data_in\functions\market\models
+
+
 Timeseries Output File Type
 -----------------------------
 The timeseries output file type defines the file format for storing time-series simulation output.
@@ -183,6 +229,53 @@ and input file.
         fsp:
             fsp_sheetname: 'fsp_data'
             fsp_input_filename: 'FSP_data_PL.xlsx'
+
+
+Flexibility Service Provider Modules Configuration
+-----------------------------------------------------
+The `fsp_modules` parameter is a dictionary used to define the fsp modules for each fsp type in the market.
+This dictionary maps fsp names to the Python files that contain the respective fsp model definitions.
+This configuration allows users to customize how different resources (such as storage, sgen and load)
+are modeled in the market. The structure of the dictionary is as follow:
+
+- **Key (Resource Name)**: The name of the resource as set by the user.
+This name must exactly match the value in the `"type"` column of the resource category in the fsp file.
+
+- **Value (Model File)**: The name of the Python file where the model for the respective resource is implemented.
+The filename should be provided without the `.py` extension.
+
+To clarify, ensure that each **resource name** used as a key in the dictionary matches the `"type"` column in
+the fsp file as in the figure.
+
+.. image:: /pics/fsp_modules.jpg
+    :width: 400 px
+    :align: center
+
+
+Additionally, the **Python file** should contain the logic and definitions for each specific fsp model definition.
+Do not include the `.py` extension when specifying the Python file name. It is suggested that only the required modules
+for the resources included in the fsp file, are defined in the dictionary.
+
+**Type**:
+Dictionary
+
+**Example**::
+
+    fsp_modules:
+        B: 'generator_model'
+        C: 'storage_model'
+
+
+In this example:
+
+- *B*, the user-defined name for resource category static generator, uses the `generator_model.py` file to define the
+static generator model.
+
+- *C*, the user-defined name for resource category storage, uses the `storage_model.py` file to define the storage model.
+
+All the Python files must be saved in the following path::
+
+    C:\Users\...\EnginIITe\data_in\functions\market\models
 
 
 Model Tag
