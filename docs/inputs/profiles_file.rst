@@ -84,7 +84,7 @@ generally to all resources sharing that profile.
 For profiles defined via an external module, there is no need for a profile file unless required by the user.
 This option is used when profiles require more complex calculations or are generated according to the user preferences.
 In case the user need to pass input parameters to the external module that defines the profiles,
-as presented as example of profiles definition in the :ref:`Config File Documentation <_profiles>`,
+as presented as example of profiles definition in the :ref:`Config File Documentation <profiles>`,
 the user can add the name of the input parameters file for the external module. This file must be saved in the following
 folder:
 
