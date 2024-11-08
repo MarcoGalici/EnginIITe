@@ -12,5 +12,6 @@ markets.
     :maxdepth: 2
 
     about
+    flowchart
     input
     file_io
