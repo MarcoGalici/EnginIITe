@@ -15,5 +15,5 @@ Key Functions
 
 The following key functions are described in the following link:
 
-- **File Input/Output**: :ref:`Input Output Functions Documentation <_file_io>`.
+- **Input/Output Functions**: :ref:`<file_io>`.
 
