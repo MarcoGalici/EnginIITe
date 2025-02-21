@@ -11,7 +11,6 @@ def import_yaml(_yaml_filename, _folder, **kwargs):
         **_config_file** (dict) - config network file data.
 
     Example:
-
         >>> my_config_yaml_file = import_yaml('my_yaml_file.yaml', 'my_folder')
 
     """

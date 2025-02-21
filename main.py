@@ -14,6 +14,7 @@ import functions.network.sensitivity_factors as calc_sens
 
 if __name__ == '__main__':
     start_time = time.time()
+    exit()
 
     file_cfg_name = 'config_Portugal_scen1.yaml'
 

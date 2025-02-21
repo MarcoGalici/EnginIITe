@@ -377,17 +377,8 @@ Boolean
 
 Consecutive Hours Parameter
 ------------------------------
-This parameter is active only when the `intertemp_cons` parameter is active as well. This parameter set the number of
-consecutive hours that will be linked for creating the simulation hours. This means that if the hours with thermal or
-over/under voltage issues are not consecutive, and the `intertemp_cons` parameter is active, the platform will create a
-simulation window in which the hours with thermal or over/under voltage issues are connected in a window of at least
-`consecutive_hours` values. In case the hours with thermal or over/under voltage issues cannot be connected in a window
-of at least `consecutive_hours` values, the platform will put the hours with issues at the center of a simulation
-window of `consecutive_hours` values. To clarify is provided an example in the following:
-
-- hours_with_issues: [12, 13, 14, 54, 64, 79, 122]
-
-- new_simulation_window: [0, ..., 12, 13, 14, ..., 27, 42, ..., 54, ..., 64, ..., 76, 77, 78, 79, ..., 91, 110, ..., 122, ..., 134]
+This parameter defines the minimum length of the simulation window.
+The optimizer will run over a sequence of at least `consecutive_hours` time steps.
 
 **Type**:
 Integer
@@ -528,15 +519,46 @@ Boolean
     debug_save_VPilotBus_FULLH: True
 
 
-KPI Parameters
-----------------
-Tolerances for voltage and current simulations. These parameters impact both the market and KPI evaluation.
+Tolerance Parameters
+---------------------
+The following parameters define tolerance levels for voltage and current limits in both technical constraints and
+optimization constraints. All values are expressed as percentages (0 to 100), where:
+
+* 0% (0.00) keeps the original technical or optimization limits unchanged.
+* 100% (1.00) allows a full variation (±100%) of the respective limits.
+
+The technical tolerance parameters directly adjust the operational limits for voltage and current:
+
+* tol_v (Voltage Tolerance, %): Modifies the allowed voltage limits in per unit (p.u.).
+* tol_i (Current Tolerance, %): Modifies the allowed current limits as a percentage of nominal loading.
+
+If tol_v = 2%, the voltage range (originally 1.05 - 0.95 p.u.) becomes:
+
+* New Upper Limit: 1.05 × (1 - 0.02) = 1.029 p.u.
+* New Lower Limit: 0.95 × (1 + 0.02) = 0.969 p.u.
+
+These optimization constraints tolerance parameters adjust the constraints used in optimization based on the
+technical tolerance limits:
+
+* tol_v_opt (Voltage Control Tolerance, %): Adjusts voltage limits for optimization calculations.
+* tol_i_opt (Congestion Management Tolerance, %): Adjusts current loading limits used in congestion management.
+
+If tol_v_opt = 2%, the same voltage limits (1.05 - 0.95 p.u.) are modified for optimization:
+
+* New Upper Limit: 1.05 × (1 - 0.02) = 1.029 p.u.
+* New Lower Limit: 0.95 × (1 + 0.02) = 0.969 p.u.
+
+If tol_i_opt = 5%, a system with 100% loading limit will be reduced to:
+
+* New Current Limit: 95% loading
 
 **Type**:  
 Float
 
 **Example**::
 
-    tol_v: 0.005
-    tol_i: 0.005
+    tol_v: 0
+    tol_i: 0
+    tol_v_opt: 0
+    tol_i_opt: 0
 
